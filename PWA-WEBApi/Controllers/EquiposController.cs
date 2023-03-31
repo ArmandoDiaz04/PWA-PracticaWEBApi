@@ -21,7 +21,22 @@ namespace PWA_WEBApi.Controllers
         [HttpGet]
         [Route("GetAll")]
         public ActionResult Get() {
-            List<Equipo> listadoEquipos = _equipoContext.Equipos.Where( x => x.estado == "A").ToList();
+            var listadoEquipos = (from equipo in _equipoContext.Equipos
+                                  join estado in _equipoContext.estados_equipo on equipo.estado_equipo_id equals estado.id_estados_equipo
+                                  join tipoEquipo in _equipoContext.tipo_equipo on equipo.tipo_equipo_id equals tipoEquipo.id_tipo_equipo
+                                  join marca in _equipoContext.Marcas on equipo.marca_id equals marca.id_marcas
+                                  select new
+                                  {
+                                      equipo.nombre,
+                                      equipo.descripcion,
+                                      descripcionTipo = tipoEquipo.descripcion,
+                                      marca.nombre_marca,
+                                      equipo.modelo,
+                                      equipo.anio_compra,
+                                      equipo.costo,
+                                      equipo.vida_util,
+                                      estadoEquipo = estado.descripcion
+                                  }).ToList();
 
             if (listadoEquipos.Count == 0)
             {
